@@ -1,0 +1,8 @@
+*.exe
+kubeconfig
+
+.terraform/
+terraform.tfstate.d/
+terraform.*tfvars
+terraform.tfstate
+terraform.tfstate.backup
