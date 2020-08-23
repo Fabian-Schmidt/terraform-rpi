@@ -59,7 +59,7 @@ resource "null_resource" "k3s_install_workernode" {
   provisioner "remote-exec" {
     inline = [
       "curl -sfL https://get.k3s.io | K3S_URL=https://${var.master_ip}:6443 K3S_TOKEN=${var.master_token} sh -",
-      "sleep 30",
+      "sleep 5",
     ]
   }
 }

@@ -62,7 +62,7 @@ Before first use terraform modules must be initialized
 ```
 
 ```cmd
-   terraform workspace new rpi2
+   terraform workspace new rpi4
    terraform workspace select rpi4
    terraform init
    terraform plan -var-file="terraform.rpi4.tfvars"

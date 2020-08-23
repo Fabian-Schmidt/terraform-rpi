@@ -43,7 +43,7 @@ module "apt_upgrade" {
   connection = local.connectionkey
 
   depends = [
-    module.authorized_keys
+    module.authorized_keys,
   ]
 }
 
@@ -55,7 +55,7 @@ module "apt_install" {
 
   depends = [
     module.authorized_keys,
-    module.apt_upgrade
+    module.apt_upgrade,
   ]
 }
 
@@ -67,7 +67,8 @@ module "hostname" {
 
   depends = [
     module.authorized_keys,
-    module.apt_install
+    module.apt_upgrade,
+    module.apt_install,
   ]
 }
 
@@ -79,7 +80,9 @@ module "timezone" {
 
   depends = [
     module.authorized_keys,
-    module.hostname
+    module.apt_upgrade,
+    module.apt_install,
+    module.hostname,
   ]
 }
 
@@ -89,7 +92,10 @@ module "disableswap" {
 
   depends = [
     module.authorized_keys,
-    module.timezone
+    module.apt_upgrade,
+    module.apt_install,
+    module.hostname,
+    module.timezone,
   ]
 }
 
@@ -97,19 +103,31 @@ module "log2ram" {
   source = "./modules/log2ram"
   connection = local.connectionkey
 
+  ZL2R = var.useZram
+
   depends = [
     module.authorized_keys,
-    module.disableswap
+    module.apt_upgrade,
+    module.apt_install,
+    module.hostname,
+    module.timezone,
+    module.disableswap,
   ]
 }
 
 module "zramswap" {
   source = "./modules/zramswap"
   connection = local.connectionkey
+  count = var.useZram == true ? 1 : 0
 
   depends = [
     module.authorized_keys,
-    module.log2ram
+    module.apt_upgrade,
+    module.apt_install,
+    module.hostname,
+    module.timezone,
+    module.disableswap,
+    module.log2ram,
   ]
 }
 
@@ -121,7 +139,13 @@ module "syncthing" {
 
   depends = [
     module.authorized_keys,
-    module.zramswap
+    module.apt_upgrade,
+    module.apt_install,
+    module.hostname,
+    module.timezone,
+    module.disableswap,
+    module.log2ram,
+    module.zramswap,
   ]
 }
 
@@ -131,7 +155,14 @@ module "cgroup" {
 
   depends = [
     module.authorized_keys,
-    module.syncthing
+    module.apt_upgrade,
+    module.apt_install,
+    module.hostname,
+    module.timezone,
+    module.disableswap,
+    module.log2ram,
+    module.zramswap,
+    module.syncthing,
   ]
 }
 
@@ -142,7 +173,15 @@ module "rtc-ds3231n" {
 
   depends = [
     module.authorized_keys,
-    module.cgroup
+    module.apt_upgrade,
+    module.apt_install,
+    module.hostname,
+    module.timezone,
+    module.disableswap,
+    module.log2ram,
+    module.zramswap,
+    module.syncthing,
+    module.cgroup,
   ]
 }
 

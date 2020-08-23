@@ -111,6 +111,8 @@ resource "null_resource" "syncthing_config" {
       #Give syncthing a moment
       "sleep 5",
       "sed -i \"s/<address>.*:8384<\\/address>/<address>${var.listenIp}:8384<\\/address>/g\" /home/${var.user}/.config/syncthing/config.xml",
+      "sed -i \"s/<urAccepted>.*<\\/urAccepted>/<urAccepted>-1<\\/urAccepted>/g\" /home/${var.user}/.config/syncthing/config.xml",
+      "sed -i \"s/<urSeen>.*<\\/urSeen>/<urSeen>3<\\/urSeen>/g\" /home/${var.user}/.config/syncthing/config.xml",
       "sudo systemctl start syncthing@${var.user}.service",
       "systemctl status syncthing@${var.user} --no-pager -l",
       #Give syncthing a moment

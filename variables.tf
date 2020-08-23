@@ -30,6 +30,11 @@ variable "hasRTC" {
   default = false
 }
 
+variable "useZram" {
+  type = bool
+  default = true
+}
+
 variable "timezone" {
   type = string
   default = "Europe/London"

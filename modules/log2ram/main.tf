@@ -22,6 +22,14 @@ example : PATH_DISK="/var/log;/home/test/FolderInRam"
 EOF
 }
 
+variable "ZL2R" {
+    type = bool
+    default = true
+    description = <<EOF
+ZL2R Zram Log 2 Ram enables a zram drive when ZL2R=true ZL2R=false is mem only tmpfs
+EOF
+}
+
 variable "COMP_ALG" {
     type = string
     default = "lz4"
@@ -62,6 +70,7 @@ resource "null_resource" "log2ram" {
     trigger       = var.trigger
     SIZE          = var.SIZE
     PATH_DISK     = var.PATH_DISK
+    ZL2R          = var.ZL2R
     COMP_ALG      = var.COMP_ALG
     LOG_DISK_SIZE = var.LOG_DISK_SIZE
   }
@@ -107,7 +116,7 @@ resource "null_resource" "log2ram" {
       # disable mail
       "sudo sed -i \"s/^MAIL=true/MAIL=false/g\" /etc/log2ram.conf",
       # activate zram
-      "sudo sed -i \"s/^ZL2R=false/ZL2R=true/g\" /etc/log2ram.conf",
+      "sudo sed -i \"s/^ZL2R=.*/ZL2R=${tostring(var.ZL2R)}/g\" /etc/log2ram.conf",
       # configuration
       "sudo sed -i \"s/^SIZE=.*$/SIZE=${var.SIZE}/g\" /etc/log2ram.conf",
       "sudo sed -i \"s/^PATH_DISK=\\\".*\\\"$/PATH_DISK=\\\"${local.PATH_DISK_Escaped}\\\"/g\" /etc/log2ram.conf",
