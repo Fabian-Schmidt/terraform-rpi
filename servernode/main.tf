@@ -43,9 +43,10 @@ module "apt_install" {
   source = "../modules/apt_install"
   connection = local.connectionkey
 
-  install = "ncdu htop nano mc iotop syncthing"
+  install = "ncdu htop nano mc iotop"
 
   depends = [
+    module.authorized_keys,
     module.apt_upgrade
   ]
 }
@@ -57,6 +58,7 @@ module "hostname" {
   hostname = var.hostname
 
   depends = [
+    module.authorized_keys,
     module.apt_install
   ]
 }
@@ -68,6 +70,7 @@ module "timezone" {
   timezone = var.timezone
 
   depends = [
+    module.authorized_keys,
     module.hostname
   ]
 }
@@ -77,7 +80,40 @@ module "disableswap" {
   connection = local.connectionkey
 
   depends = [
+    module.authorized_keys,
     module.timezone
+  ]
+}
+
+module "log2ram" {
+  source = "../modules/log2ram"
+  connection = local.connectionkey
+
+  depends = [
+    module.authorized_keys,
+    module.disableswap
+  ]
+}
+
+module "zramswap" {
+  source = "../modules/zramswap"
+  connection = local.connectionkey
+
+  depends = [
+    module.authorized_keys,
+    module.log2ram
+  ]
+}
+
+module "syncthing" {
+  source = "../modules/syncthing"
+  connection = local.connectionkey
+
+  listenIp = "0.0.0.0"
+
+  depends = [
+    module.authorized_keys,
+    module.zramswap
   ]
 }
 
@@ -86,20 +122,32 @@ module "reboot" {
   connection = local.connectionkey
   
   depends = [
+    module.authorized_keys,
+    module.apt_upgrade,
+    module.apt_install,
     module.hostname,
     module.timezone,
     module.disableswap,
+    module.log2ram,
+    module.zramswap,
+    module.syncthing,
   ]
 }
 
-module "k3s_install_node" {
-  source = "../modules/k3s_install_node"
+module "k3s_install_servernode" {
+  source = "../modules/k3s_install_servernode"
   connection = local.connectionkey
-  
-  master_ip = var.k3s_master_ip
-  master_token = var.k3s_master_token
 
   depends = [
+    module.authorized_keys,
+    module.apt_upgrade,
+    module.apt_install,
+    module.hostname,
+    module.timezone,
+    module.disableswap,
+    module.log2ram,
+    module.zramswap,
+    module.syncthing,
     module.reboot,
   ]
 }

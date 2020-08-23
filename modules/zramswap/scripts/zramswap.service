@@ -1,0 +1,17 @@
+[Unit]
+Description=ZramSwap
+DefaultDependencies=no
+Before=basic.target rsyslog.service syslog-ng.service syslog.target systemd-journald.service sysinit.target shutdown.target zram-swap-conf.service apache2.service lighttpd.service
+After=local-fs.target
+Conflicts=shutdown.target reboot.target halt.target
+IgnoreOnIsolate=yes
+
+[Service]
+Type=oneshot
+ExecStart= /usr/local/bin/zramswap start
+ExecStop= /usr/local/bin/zramswap stop
+TimeoutStartSec=120
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sysinit.target

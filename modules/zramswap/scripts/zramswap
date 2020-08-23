@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+
+. /etc/zramswap.conf
+
+createZramSwap () {
+	# Check Zram Class created
+	if [ ! -d "/sys/class/zram-control" ]; then
+		modprobe zram
+		RAM_DEV='0'
+	else
+		RAM_DEV=$(cat /sys/class/zram-control/hot_add)
+	fi
+	echo ${COMP_ALG} > /sys/block/zram${RAM_DEV}/comp_algorithm
+	echo ${DISK_SIZE} > /sys/block/zram${RAM_DEV}/disksize
+	echo ${MEM_LIMIT} > /sys/block/zram${RAM_DEV}/mem_limit
+
+    mkswap /dev/zram${RAM_DEV}
+    swapon -p 5 /dev/zram${RAM_DEV}
+}
+
+case "$1" in
+    start)
+        createZramSwap
+        ;;
+
+    stop)
+        swapoff -a
+        ;;
+
+    *)
+        echo "Usage: zramswap {start|stop}" >&2
+        exit 1
+        ;;
+esac

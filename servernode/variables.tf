@@ -1,7 +1,5 @@
 variable "ip_adress" {}
 
-variable "k3s_cluster_cidr" {}
-
 variable "hostname" {
   default = "rpi-host"
 }

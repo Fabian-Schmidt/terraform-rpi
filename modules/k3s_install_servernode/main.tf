@@ -2,15 +2,6 @@ variable "connection" {
   type = map(any)
 }
 
-variable "cluster-cidr" {
-    type = string
-}
-
-variable "flannel-backend" {
-    type = string
-    default = "none"
-}
-
 variable "depends" {
   default = []
 }
@@ -22,7 +13,7 @@ variable "trigger" {
 
 locals {}
 
-resource "null_resource" "k3s_install_master" {
+resource "null_resource" "k3s_install_servernode" {
   triggers = {
     trigger  = var.trigger
   }
@@ -59,7 +50,7 @@ resource "null_resource" "k3s_install_master" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC=\"--flannel-backend=${var.flannel-backend} --cluster-cidr=${var.cluster-cidr}\" sh -",
+      "sudo curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC=\"\" sh -",
       "sleep 30",
       "sudo k3s kubectl get node",
 
