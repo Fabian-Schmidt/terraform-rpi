@@ -2,6 +2,11 @@ variable "connection" {
   type = map(any)
 }
 
+variable "reboot_waittime" {
+  type = number
+  default = 30
+}
+
 variable "depends" {
   default = []
 }
@@ -59,7 +64,7 @@ resource "null_resource" "reboot" {
   }
 
   provisioner "local-exec" {
-    command = "PowerShell -Command Start-Sleep 30"
+    command = "PowerShell -Command Start-Sleep ${var.reboot_waittime}"
   }
 
   provisioner "remote-exec" {

@@ -24,14 +24,14 @@ locals {
 }
 
 module "authorized_keys" {
-  source = "../modules/authorized_keys"
+  source = "./modules/authorized_keys"
   connection = local.connectionpw
 
   ssh_public_key = var.ssh_public_key
 }
 
 module "apt_upgrade" {
-  source = "../modules/apt_upgrade"
+  source = "./modules/apt_upgrade"
   connection = local.connectionkey
 
   depends = [
@@ -40,7 +40,7 @@ module "apt_upgrade" {
 }
 
 module "apt_install" {
-  source = "../modules/apt_install"
+  source = "./modules/apt_install"
   connection = local.connectionkey
 
   install = "ncdu htop nano mc iotop"
@@ -52,7 +52,7 @@ module "apt_install" {
 }
 
 module "hostname" {
-  source = "../modules/hostname"
+  source = "./modules/hostname"
   connection = local.connectionkey
 
   hostname = var.hostname
@@ -64,7 +64,7 @@ module "hostname" {
 }
 
 module "timezone" {
-  source = "../modules/timezone"
+  source = "./modules/timezone"
   connection = local.connectionkey
 
   timezone = var.timezone
@@ -76,7 +76,7 @@ module "timezone" {
 }
 
 module "disableswap" {
-  source = "../modules/disableswap"
+  source = "./modules/disableswap"
   connection = local.connectionkey
 
   depends = [
@@ -86,7 +86,7 @@ module "disableswap" {
 }
 
 module "log2ram" {
-  source = "../modules/log2ram"
+  source = "./modules/log2ram"
   connection = local.connectionkey
 
   depends = [
@@ -96,7 +96,7 @@ module "log2ram" {
 }
 
 module "zramswap" {
-  source = "../modules/zramswap"
+  source = "./modules/zramswap"
   connection = local.connectionkey
 
   depends = [
@@ -106,7 +106,7 @@ module "zramswap" {
 }
 
 module "syncthing" {
-  source = "../modules/syncthing"
+  source = "./modules/syncthing"
   connection = local.connectionkey
 
   listenIp = "0.0.0.0"
@@ -118,7 +118,7 @@ module "syncthing" {
 }
 
 module "cgroup" {
-  source = "../modules/cgroup"
+  source = "./modules/cgroup"
   connection = local.connectionkey
 
   depends = [
@@ -128,8 +128,9 @@ module "cgroup" {
 }
 
 module "rtc-ds3231n" {
-  source = "../modules/rtc-ds3231n"
+  source = "./modules/rtc-ds3231n"
   connection = local.connectionkey
+  count = var.hasRTC == true ? 1 : 0
 
   depends = [
     module.authorized_keys,
@@ -138,8 +139,10 @@ module "rtc-ds3231n" {
 }
 
 module "reboot" {
-  source = "../modules/reboot"
+  source = "./modules/reboot"
   connection = local.connectionkey
+
+  reboot_waittime = var.reboot_waittime
   
   depends = [
     module.authorized_keys,
@@ -157,8 +160,33 @@ module "reboot" {
 }
 
 module "k3s_install_servernode" {
-  source = "../modules/k3s_install_servernode"
+  source = "./modules/k3s_install_servernode"
   connection = local.connectionkey
+  count = var.k3s_servernode == true ? 1 : 0
+
+  depends = [
+    module.authorized_keys,
+    module.apt_upgrade,
+    module.apt_install,
+    module.hostname,
+    module.timezone,
+    module.disableswap,
+    module.log2ram,
+    module.zramswap,
+    module.syncthing,
+    module.cgroup,
+    module.rtc-ds3231n,
+    module.reboot,
+  ]
+}
+
+module "k3s_install_workernode" {
+  source = "./modules/k3s_install_workernode"
+  connection = local.connectionkey
+  count = var.k3s_workernode == true ? 1 : 0
+  
+  master_ip = var.k3s_master_ip
+  master_token = var.k3s_master_token
 
   depends = [
     module.authorized_keys,
