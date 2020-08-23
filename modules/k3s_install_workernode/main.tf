@@ -21,7 +21,7 @@ variable "trigger" {
 
 locals {}
 
-resource "null_resource" "k3s_install_node" {
+resource "null_resource" "k3s_install_workernode" {
   triggers = {
     trigger  = var.trigger
   }
@@ -60,7 +60,6 @@ resource "null_resource" "k3s_install_node" {
     inline = [
       "curl -sfL https://get.k3s.io | K3S_URL=https://${var.master_ip}:6443 K3S_TOKEN=${var.master_token} sh -",
       "sleep 30",
-      "sudo k3s kubectl get node",
     ]
   }
 }

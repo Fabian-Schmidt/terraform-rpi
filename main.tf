@@ -21,6 +21,14 @@ locals {
     private_key = var.ssh_private_key
     timeout  = local.ssh_timeout
   }
+
+  connectionkey_k3s_server = {
+    type     = "ssh"
+    host     = var.k3s_master_ip
+    user     = var.initial_user
+    private_key = var.ssh_private_key
+    timeout  = local.ssh_timeout
+  }
 }
 
 module "authorized_keys" {
@@ -201,5 +209,27 @@ module "k3s_install_workernode" {
     module.cgroup,
     module.rtc-ds3231n,
     module.reboot,
+  ]
+}
+
+module "k3s_nodelist" {
+  source = "./modules/k3s_nodelist"
+  connection = local.connectionkey_k3s_server
+  
+  depends = [
+    module.authorized_keys,
+    module.apt_upgrade,
+    module.apt_install,
+    module.hostname,
+    module.timezone,
+    module.disableswap,
+    module.log2ram,
+    module.zramswap,
+    module.syncthing,
+    module.cgroup,
+    module.rtc-ds3231n,
+    module.reboot,
+    module.k3s_install_servernode,
+    module.k3s_install_workernode,
   ]
 }

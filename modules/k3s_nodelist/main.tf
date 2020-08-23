@@ -11,13 +11,11 @@ variable "trigger" {
   default = ""
 }
 
-locals {
-  tempFolder = "/tmp/rtc-ds3231n/"
-}
+locals {}
 
-resource "null_resource" "rtc-ds3231n" {
+resource "null_resource" "k3s_nodelist" {
   triggers = {
-    trigger       = var.trigger
+    trigger  = var.trigger
   }
   depends_on = [var.depends]
 
@@ -50,26 +48,9 @@ resource "null_resource" "rtc-ds3231n" {
     bastion_certificate = try(var.connection["bastion_certificate"], null)
   }
 
-  provisioner "file" {
-    source      = "${path.module}/scripts"
-    destination = local.tempFolder
-  }
-
   provisioner "remote-exec" {
     inline = [
-      # activate i2c on raspberry
-      "sudo sed -i \"s/^#dtparam=i2c_arm=on/dtparam=i2c_arm=on/g\" /boot/config.txt",
-
-      "sudo apt install i2c-tools -y",
-
-      "sudo install -m 644 ${local.tempFolder}modules-load.d/rtc-i2c.conf /etc/modules-load.d/rtc-i2c.conf",
-      "sudo install -m 644 ${local.tempFolder}rtc-i2c.conf /etc/rtc-i2c.conf",
-      "sudo install -m 755 ${local.tempFolder}rtc-i2c.rules /etc/udev/rules.d/rtc-i2c.rules",
-      "sudo install -m 755 ${local.tempFolder}rtc-i2c.service /etc/systemd/system/rtc-i2c.service",
-      "sudo systemctl daemon-reload",
-      "sudo systemctl enable rtc-i2c.service",
-      
-      "rm -rf ${local.tempFolder}",
+      "sudo k3s kubectl get node",
     ]
   }
 }
