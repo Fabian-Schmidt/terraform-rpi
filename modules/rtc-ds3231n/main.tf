@@ -2,14 +2,6 @@ variable "connection" {
   type = map(any)
 }
 
-variable "master_ip" {
-    type = string
-}
-
-variable "master_token" {
-    type = string
-}
-
 variable "depends" {
   default = []
 }
@@ -19,11 +11,13 @@ variable "trigger" {
   default = ""
 }
 
-locals {}
+locals {
+  tempFolder = "/tmp/rtc-ds3231n/"
+}
 
-resource "null_resource" "k3s_install_node" {
+resource "null_resource" "rtc-ds3231n" {
   triggers = {
-    trigger  = var.trigger
+    trigger       = var.trigger
   }
   depends_on = [var.depends]
 
@@ -56,11 +50,33 @@ resource "null_resource" "k3s_install_node" {
     bastion_certificate = try(var.connection["bastion_certificate"], null)
   }
 
+  provisioner "file" {
+    source      = "${path.module}/scripts"
+    destination = local.tempFolder
+  }
+
   provisioner "remote-exec" {
     inline = [
-      "curl -sfL https://get.k3s.io | K3S_URL=https://${var.master_ip}:6443 K3S_TOKEN=${var.master_token} sh -",
-      "sleep 30",
-      "sudo k3s kubectl get node",
+      # activate i2c on raspberry
+      "if grep -q 'dtparam=i2c_arm=on' /boot/cmdline.txt; then",
+      "  echo 'dtparam=i2c_arm=on found in /boot/cmdline.txt'",
+      "else",
+      "  echo 'dtparam=i2c_arm=on not found in /boot/cmdline.txt'",
+      "  cat /boot/cmdline.txt",
+      "  sudo sed -i -e '1s/$/ dtparam=i2c_arm=on/g' /boot/cmdline.txt",
+      "  cat /boot/cmdline.txt",
+      "fi",
+
+      "sudo apt install i2c-tools -y",
+
+      "sudo install -m 644 ${local.tempFolder}modules-load.d/rtc-i2c.conf /etc/modules-load.d/rtc-i2c.conf",
+      "sudo install -m 644 ${local.tempFolder}rtc-i2c.conf /etc/rtc-i2c.conf",
+      "sudo install -m 755 ${local.tempFolder}rtc-i2c.rules /etc/udev/rules.d/rtc-i2c.rules",
+      "sudo install -m 755 ${local.tempFolder}rtc-i2c.service /etc/systemd/system/rtc-i2c.service",
+      "sudo systemctl daemon-reload",
+      "sudo systemctl enable rtc-i2c.service",
+      
+      "rm -rf ${local.tempFolder}",
     ]
   }
 }

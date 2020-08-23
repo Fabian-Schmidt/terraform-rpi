@@ -1,0 +1,19 @@
+# /lib/systemd/system/rtc-i2c.service
+
+[Unit]
+Description=Initialize i2c hardware RTC device driver
+DefaultDependencies=no
+Requires=systemd-modules-load.service
+After=systemd-modules-load.service
+Before=sysvinit.target
+ConditionPathExists=/sys/class/i2c-adapter
+Conflicts=shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+EnvironmentFile=/etc/rtc-i2c.conf
+ExecStart=/bin/sh -c "echo ${CHIP} ${ADDRESS} > /sys/class/i2c-adapter/i2c-${BUS}/new_device"
+
+[Install]
+WantedBy=sysinit.target

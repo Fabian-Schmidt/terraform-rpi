@@ -15,7 +15,7 @@ locals {}
 
 resource "null_resource" "cgroup" {
   triggers = {
-      user = var.user
+    trigger = var.trigger
   }
   depends_on = [var.depends]
 

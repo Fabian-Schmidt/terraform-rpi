@@ -1,0 +1,6 @@
+# /etc/udev/rules.d/rtc-i2c.rules
+#
+# I would prefer to put SUBSYSTEMS="i2c",
+# but for some reason it's not working on my system.
+#
+ACTION=="add", SUBSYSTEM=="rtc", ATTRS{hctosys}=="0", RUN+="/sbin/hwclock -s --utc"

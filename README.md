@@ -45,6 +45,7 @@ Before first use terraform modules must be initialized
 
 ```cmd
    cd servernode
+   ..\terraform workspace new rpi2
    ..\terraform workspace select rpi2
    ..\terraform init
    ..\terraform plan -var-file="terraform.rpi2.tfvars"
@@ -55,6 +56,7 @@ Before first use terraform modules must be initialized
 
 ```cmd
    cd workernode
+   ..\terraform workspace new rpi3
    ..\terraform workspace select rpi3
    ..\terraform init
    ..\terraform plan -var-file="terraform.rpi3.tfvars"
@@ -63,6 +65,7 @@ Before first use terraform modules must be initialized
 
 ```cmd
    cd workernode
+   ..\terraform workspace new rpi2
    ..\terraform workspace select rpi4
    ..\terraform init
    ..\terraform plan -var-file="terraform.rpi4.tfvars"

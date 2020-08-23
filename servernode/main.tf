@@ -121,11 +121,19 @@ module "cgroup" {
   source = "../modules/cgroup"
   connection = local.connectionkey
 
-  listenIp = "0.0.0.0"
-
   depends = [
     module.authorized_keys,
     module.syncthing
+  ]
+}
+
+module "rtc-ds3231n" {
+  source = "../modules/rtc-ds3231n"
+  connection = local.connectionkey
+
+  depends = [
+    module.authorized_keys,
+    module.cgroup
   ]
 }
 
@@ -144,6 +152,7 @@ module "reboot" {
     module.zramswap,
     module.syncthing,
     module.cgroup,
+    module.rtc-ds3231n,
   ]
 }
 
@@ -162,6 +171,7 @@ module "k3s_install_servernode" {
     module.zramswap,
     module.syncthing,
     module.cgroup,
+    module.rtc-ds3231n,
     module.reboot,
   ]
 }
