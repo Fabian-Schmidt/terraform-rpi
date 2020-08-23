@@ -58,7 +58,16 @@ resource "null_resource" "syncthing_install" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo apt install syncthing -y",
+      # Add the release PGP keys:
+      "curl -s https://syncthing.net/release-key.txt | sudo apt-key add -",
+
+      # Add the "stable" channel to your APT sources:
+      "echo \"deb https://apt.syncthing.net/ syncthing stable\" | sudo tee /etc/apt/sources.list.d/syncthing.list",
+
+      # Update and install syncthing:
+      "sudo apt-get update",
+      "sudo apt-get install syncthing -y"
+
       "sudo systemctl enable syncthing@${var.user}.service",
       "sudo systemctl start syncthing@${var.user}.service",
       #Give syncthing a moment
