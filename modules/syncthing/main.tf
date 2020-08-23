@@ -61,7 +61,9 @@ resource "null_resource" "syncthing_install" {
       "sudo apt install syncthing -y",
       "sudo systemctl enable syncthing@${var.user}.service",
       "sudo systemctl start syncthing@${var.user}.service",
-      "systemctl status syncthing@${var.user} --no-pager",
+      #Give syncthing a moment
+      "sleep 10",
+      "systemctl status syncthing@${var.user} --no-pager -l",
     ]
   }
 }
@@ -106,9 +108,13 @@ resource "null_resource" "syncthing_config" {
   provisioner "remote-exec" {
     inline = [
       "sudo systemctl stop syncthing@${var.user}.service",
+      #Give syncthing a moment
+      "sleep 5",
       "sed -i \"s/<address>.*:8384<\\/address>/<address>${var.listenIp}:8384<\\/address>/g\" /home/${var.user}/.config/syncthing/config.xml",
       "sudo systemctl start syncthing@${var.user}.service",
-      "systemctl status syncthing@${var.user} --no-pager",
+      "systemctl status syncthing@${var.user} --no-pager -l",
+      #Give syncthing a moment
+      "sleep 10",
     ]
   }
 }

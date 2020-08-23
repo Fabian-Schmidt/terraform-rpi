@@ -76,6 +76,7 @@ resource "null_resource" "zramswap_install" {
       "sudo install -m 755 ${local.tempFolder}zramswap /usr/local/bin/zramswap",
       "sudo install -m 644 ${local.tempFolder}zramswap.conf /etc/zramswap.conf",
       "sudo systemctl daemon-reload",
+      "sudo systemctl enable zramswap.service",
       "rm -rf ${local.tempFolder}",
     ]
   }

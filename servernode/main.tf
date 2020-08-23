@@ -117,6 +117,18 @@ module "syncthing" {
   ]
 }
 
+module "cgroup" {
+  source = "../modules/cgroup"
+  connection = local.connectionkey
+
+  listenIp = "0.0.0.0"
+
+  depends = [
+    module.authorized_keys,
+    module.syncthing
+  ]
+}
+
 module "reboot" {
   source = "../modules/reboot"
   connection = local.connectionkey
@@ -131,6 +143,7 @@ module "reboot" {
     module.log2ram,
     module.zramswap,
     module.syncthing,
+    module.cgroup,
   ]
 }
 
@@ -148,6 +161,7 @@ module "k3s_install_servernode" {
     module.log2ram,
     module.zramswap,
     module.syncthing,
+    module.cgroup,
     module.reboot,
   ]
 }

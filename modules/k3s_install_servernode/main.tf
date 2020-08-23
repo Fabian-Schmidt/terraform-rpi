@@ -50,7 +50,7 @@ resource "null_resource" "k3s_install_servernode" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC=\"\" sh -",
+      "curl -sfL https://get.k3s.io | sh -",
       "sleep 30",
       "sudo k3s kubectl get node",
 

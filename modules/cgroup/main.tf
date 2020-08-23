@@ -2,14 +2,6 @@ variable "connection" {
   type = map(any)
 }
 
-variable "master_ip" {
-    type = string
-}
-
-variable "master_token" {
-    type = string
-}
-
 variable "depends" {
   default = []
 }
@@ -21,9 +13,9 @@ variable "trigger" {
 
 locals {}
 
-resource "null_resource" "k3s_install_node" {
+resource "null_resource" "cgroup" {
   triggers = {
-    trigger  = var.trigger
+      user = var.user
   }
   depends_on = [var.depends]
 
@@ -58,9 +50,24 @@ resource "null_resource" "k3s_install_node" {
 
   provisioner "remote-exec" {
     inline = [
-      "curl -sfL https://get.k3s.io | K3S_URL=https://${master_ip}:6443 K3S_TOKEN=${master_token} sh -",
-      "sleep 30",
-      "sudo k3s kubectl get node",
+      "if grep -q 'group_memory' /boot/cmdline.txt; then",
+      "  echo 'group_memory found in /boot/cmdline.txt'",
+      "else",
+      "  echo 'group_memory not found in /boot/cmdline.txt'",
+      "  cat /boot/cmdline.txt",
+      "  sudo sed -i -e '1s/$/ cgroup_memory=1/g' /boot/cmdline.txt",
+      "  cat /boot/cmdline.txt",
+      "fi",
+
+      "if grep -q 'cgroup_enable' /boot/cmdline.txt; then",
+      "  echo 'cgroup_enable found in /boot/cmdline.txt'",
+      "else",
+      "  echo 'cgroup_enable not found in /boot/cmdline.txt'",
+      "  cat /boot/cmdline.txt",
+      "  sudo sed -i -e '1s/$/ cgroup_enable=memory/g' /boot/cmdline.txt",
+      "  cat /boot/cmdline.txt",
+      "fi",
     ]
   }
 }
+
