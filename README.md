@@ -16,27 +16,27 @@ An Example File "terraform.tfvars.example" is included.
 Before first use terraform modules must be initialized
 
 ```sh
-   terraform init
+  terraform init
 ```
 
 ### Workspace
 
 ```sh
-   terraform workspace
-   terraform workspace new rpi2
-   terraform workspace select rpi2
+  terraform workspace
+  terraform workspace new rpi2
+  terraform workspace select rpi2
 ```
 
 ### plan
 
 ```sh
-   terraform plan -var-file="terraform.rpi2.tfvars"
+  terraform plan -var-file="terraform.rpi2.tfvars"
 ```
 
 ### apply
 
 ```sh
-   terraform apply -var-file="terraform.rpi2.tfvars"
+  terraform apply -var-file="terraform.rpi2.tfvars"
 ```
 
 ## Deployment
@@ -44,27 +44,59 @@ Before first use terraform modules must be initialized
 ### Servernode
 
 ```cmd
-   terraform workspace new rpi2
-   terraform workspace select rpi2
-   terraform init
-   terraform plan -var-file="terraform.rpi2.tfvars"
-   terraform apply -var-file="terraform.rpi2.tfvars"
+  terraform workspace new rpi2
+  terraform workspace select rpi2
+  terraform init
+  terraform plan -var-file="terraform.rpi2.tfvars"
+  terraform apply -var-file="terraform.rpi2.tfvars"
 ```
 
 ### Workernode
 
 ```cmd
-   terraform workspace new rpi3
-   terraform workspace select rpi3
-   terraform init
-   terraform plan -var-file="terraform.rpi3.tfvars"
-   terraform apply -var-file="terraform.rpi3.tfvars"
+  terraform workspace new rpi3
+  terraform workspace select rpi3
+  terraform init
+  terraform plan -var-file="terraform.rpi3.tfvars"
+  terraform apply -var-file="terraform.rpi3.tfvars"
 ```
 
 ```cmd
-   terraform workspace new rpi4
-   terraform workspace select rpi4
-   terraform init
-   terraform plan -var-file="terraform.rpi4.tfvars"
-   terraform apply -var-file="terraform.rpi4.tfvars"
+  terraform workspace new rpi4
+  terraform workspace select rpi4
+  terraform init
+  terraform plan -var-file="terraform.rpi4.tfvars"
+  terraform apply -var-file="terraform.rpi4.tfvars"
 ```
+
+## Kubernetes
+
+### kubeconfig
+
+1. Get kubectl <https://kubernetes.io/docs/tasks/tools/install-kubectl/>
+2. Configuration of kubectl <https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/>
+3. Test access
+   - `--kubeconfig` flag
+
+      ```cmd
+      kubectl --kubeconfig kubeconfig get node
+      ```
+
+   - `KUBECONFIG` environment variable
+
+      ```cmd
+      set KUBECONFIG=kubeconfig
+      kubectl get node
+      ```
+
+4. Create Kubernetes Dashboard
+
+   ```cmd
+   kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.3/aio/deploy/recommended.yaml
+   kubectl create -f dashboard.admin-user.yml -f dashboard.admin-user-role.yml
+   kubectl -n kubernetes-dashboard describe secret admin-user-token
+   kubectl proxy
+   ```
+
+5. Login Kubernetes Dashboard  
+   <http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/>

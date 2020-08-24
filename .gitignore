@@ -1,8 +1,10 @@
 *.exe
 kubeconfig
+*.ppk
 
 .terraform/
 terraform.tfstate.d/
 terraform.*tfvars
+!terraform.example.tfvars
 terraform.tfstate
 terraform.tfstate.backup

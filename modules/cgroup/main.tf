@@ -50,21 +50,30 @@ resource "null_resource" "cgroup" {
 
   provisioner "remote-exec" {
     inline = [
-      "if grep -q 'group_memory' /boot/cmdline.txt; then",
-      "  echo 'group_memory found in /boot/cmdline.txt'",
+      "if grep -q 'cgroup_enable=cpuset' /boot/cmdline.txt; then",
+      "  echo 'cgroup_enable=cpuset found in /boot/cmdline.txt'",
       "else",
-      "  echo 'group_memory not found in /boot/cmdline.txt'",
+      "  echo 'cgroup_enable=cpuset not found in /boot/cmdline.txt'",
       "  cat /boot/cmdline.txt",
-      "  sudo sed -i -e '1s/$/ cgroup_memory=1/g' /boot/cmdline.txt",
+      "  sudo sed -i -e '1s/$/ cgroup_enable=cpuset/g' /boot/cmdline.txt",
       "  cat /boot/cmdline.txt",
       "fi",
 
-      "if grep -q 'cgroup_enable' /boot/cmdline.txt; then",
-      "  echo 'cgroup_enable found in /boot/cmdline.txt'",
+      "if grep -q 'cgroup_enable=memory' /boot/cmdline.txt; then",
+      "  echo 'cgroup_enable=memory found in /boot/cmdline.txt'",
       "else",
-      "  echo 'cgroup_enable not found in /boot/cmdline.txt'",
+      "  echo 'cgroup_enable=memory not found in /boot/cmdline.txt'",
       "  cat /boot/cmdline.txt",
       "  sudo sed -i -e '1s/$/ cgroup_enable=memory/g' /boot/cmdline.txt",
+      "  cat /boot/cmdline.txt",
+      "fi",
+
+      "if grep -q 'cgroup_memory=1' /boot/cmdline.txt; then",
+      "  echo 'cgroup_memory found in /boot/cmdline.txt'",
+      "else",
+      "  echo 'cgroup_memory not found in /boot/cmdline.txt'",
+      "  cat /boot/cmdline.txt",
+      "  sudo sed -i -e '1s/$/ cgroup_memory=1/g' /boot/cmdline.txt",
       "  cat /boot/cmdline.txt",
       "fi",
     ]
