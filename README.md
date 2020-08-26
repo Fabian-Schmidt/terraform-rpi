@@ -1,45 +1,29 @@
 # Raspberry Pi Initialization with Terraform
 
-This is for Provisioning a Rpi2/3 with Raspian Lite.
-I have implemented this for easily bootstrapping RPI Docker Hosts
+This is for Provisioning a Rpi2/3/4 K3s cluster using terraform.
 
 ## Manual Steps
 
+### Raspberry
+
+Burn image to sd card.
+
+Inject file `/boot/ssh` to autostart ssh. <https://www.raspberrypi.org/documentation/remote-access/ssh/README.md>
+
 ### terraform.tfvars
 
-Create a file "terraform.tfvars" for easy adding variable defaults.
-Te only variable that must be set is "ip_adress" for initial connection to Raspberry Pi.
-An Example File "terraform.tfvars.example" is included.
-
-### initialize
-
-Before first use terraform modules must be initialized
-
-```sh
-  terraform init
-```
-
-### Workspace
-
-```sh
-  terraform workspace
-  terraform workspace new rpi2
-  terraform workspace select rpi2
-```
-
-### plan
-
-```sh
-  terraform plan -var-file="terraform.rpi2.tfvars"
-```
-
-### apply
-
-```sh
-  terraform apply -var-file="terraform.rpi2.tfvars"
-```
+Create a file `terraform.tfvars` for easy adding variable defaults.
+An Example File `terraform.example.tfvars` is included.
 
 ## Deployment
+
+My cluster has the following components:
+
+  Name         | Ram  | IP Address    | Hostname  | Role   |
+---------------|------|---------------|-----------|--------|
+Raspberry Pi 2 | 1 GB | 192.168.10.20 | Raspi2-01 | Master |
+Raspberry Pi 3 | 1 GB | 192.168.10.21 | Raspi3-01 | Worker |
+Raspberry Pi 4 | 8 GB | 192.168.10.22 | Raspi4-01 | Worker |
 
 ### Servernode
 
