@@ -84,3 +84,22 @@ Raspberry Pi 4 | 8 GB | 192.168.10.22 | Raspi4-01 | Worker |
 
 5. Login Kubernetes Dashboard  
    <http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/>
+
+## Loki
+
+<https://grafana.com/docs/loki/latest/installation/helm/>
+
+```sh
+helm repo add loki https://grafana.github.io/loki/charts
+helm repo update
+helm upgrade --install loki --namespace=loki --create-namespace loki/loki-stack  --set grafana.enabled=true,prometheus.enabled=true,prometheus.alertmanager.persistentVolume.enabled=false,prometheus.server.persistentVolume.enabled=false
+```
+
+### Loki Grafana
+
+```sh
+kubectl get secret --namespace loki loki-grafana -o jsonpath="{.data.admin-password}"
+kubectl port-forward --namespace loki service/loki-grafana 3000:80
+````
+
+Navigate to <http://localhost:3000> and login with `admin` and the password output above. Then follow the instructions for adding the Loki Data Source, using the URL <http://loki:3100/> for Loki.
