@@ -66,7 +66,7 @@ resource "null_resource" "syncthing_install" {
 
       # Update and install syncthing:
       "sudo apt-get update",
-      "sudo apt-get install syncthing -y"
+      "sudo apt-get install syncthing -y",
 
       "sudo systemctl enable syncthing@${var.user}.service",
       "sudo systemctl start syncthing@${var.user}.service",
