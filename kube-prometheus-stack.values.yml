@@ -1,0 +1,20 @@
+
+## Deploy a Prometheus instance
+##
+prometheus:
+  ## Settings affecting prometheusSpec
+  ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#prometheusspec
+  ##
+  prometheusSpec:
+    ## Prometheus StorageSpec for persistent data
+    ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/user-guides/storage.md
+    ##
+    storageSpec: 
+    ## Using PersistentVolumeClaim
+      volumeClaimTemplate:
+        spec:
+          storageClassName: local-path
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 2Gi

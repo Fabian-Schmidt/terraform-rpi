@@ -21,36 +21,36 @@ My cluster has the following components:
 
   Name         | Ram  | IP Address    | Hostname  | Role   |
 ---------------|------|---------------|-----------|--------|
-Raspberry Pi 2 | 1 GB | 192.168.10.20 | Raspi2-01 | Master |
+Raspberry Pi 2 | 1 GB | 192.168.10.20 | Raspi2-01 | Worker |
 Raspberry Pi 3 | 1 GB | 192.168.10.21 | Raspi3-01 | Worker |
-Raspberry Pi 4 | 8 GB | 192.168.10.22 | Raspi4-01 | Worker |
+Raspberry Pi 4 | 8 GB | 192.168.10.22 | Raspi4-01 | Master |
 
 ### Servernode
 
 ```cmd
-  terraform workspace new rpi2
-  terraform workspace select rpi2
-  terraform init
-  terraform plan -var-file="terraform.rpi2.tfvars"
-  terraform apply -var-file="terraform.rpi2.tfvars"
+terraform workspace new rpi4
+terraform workspace select rpi4
+terraform init
+terraform plan -var-file="terraform.rpi4.tfvars"
+terraform apply -var-file="terraform.rpi4.tfvars"
 ```
 
 ### Workernode
 
 ```cmd
-  terraform workspace new rpi3
-  terraform workspace select rpi3
-  terraform init
-  terraform plan -var-file="terraform.rpi3.tfvars"
-  terraform apply -var-file="terraform.rpi3.tfvars"
+terraform workspace new rpi2
+terraform workspace select rpi2
+terraform init
+terraform plan -var-file="terraform.rpi2.tfvars"
+terraform apply -var-file="terraform.rpi2.tfvars"
 ```
 
 ```cmd
-  terraform workspace new rpi4
-  terraform workspace select rpi4
-  terraform init
-  terraform plan -var-file="terraform.rpi4.tfvars"
-  terraform apply -var-file="terraform.rpi4.tfvars"
+terraform workspace new rpi3
+terraform workspace select rpi3
+terraform init
+terraform plan -var-file="terraform.rpi3.tfvars"
+terraform apply -var-file="terraform.rpi3.tfvars"
 ```
 
 ## Kubernetes
@@ -100,6 +100,15 @@ helm upgrade --install loki --namespace=loki --create-namespace loki/loki-stack 
 ```sh
 kubectl get secret --namespace loki loki-grafana -o jsonpath="{.data.admin-password}"
 kubectl port-forward --namespace loki service/loki-grafana 3000:80
-````
+```
 
 Navigate to <http://localhost:3000> and login with `admin` and the password output above. Then follow the instructions for adding the Loki Data Source, using the URL <http://loki:3100/> for Loki.
+
+## Install Prometheus and Grafana using Helm
+
+```sh
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+kubectl create namespace monitoring
+helm install prometheus --namespace monitoring --debug --values kube-prometheus-stack.values.yml prometheus-community/kube-prometheus-stack
+```
